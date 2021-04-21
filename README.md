@@ -48,6 +48,8 @@ Vagrant.configure("2") do |config|
 
 end
 BASH
+
+
 Step 2 - Update host files on both master and worker node
 master node - SSH into the master node
 
@@ -85,6 +87,8 @@ PING master.jhooq.com (100.0.0.1) 56(84) bytes of data.
 64 bytes from master.jhooq.com (100.0.0.1): icmp_seq=1 ttl=64 time=0.238 ms
 64 bytes from master.jhooq.com (100.0.0.1): icmp_seq=2 ttl=64 time=0.510 ms
 BASH
+
+
 Step 3 - Install Docker on both master and worker node
 You need to install Docker on both the node.
 
@@ -111,6 +115,8 @@ sudo systemctl status docker
      Docs: https://docs.docker.com
 
 BASH
+
+
 Step 4 - Disable the firewall and turnoff the “swapping”
 We need to disable firewall as well as swapping on master as well as worker node. Because to install kubernetes we need to disable the swapping on both the nodes
 
@@ -119,11 +125,15 @@ Firewall stopped and disabled on system startup
 
 sudo swapoff -a
 BASH
+
+
 Step 5 - Install “apt-transport-https” package
 To download the kubernetes and its public we need to install “apt-transport-https” package on both master as well as worker node
 
 sudo apt-get update && sudo apt-get install -y apt-transport-https
 BASH
+
+
 Step 6 - Download the public keys
 We need to have the public keys for accessing packages on Google Cloud.
 
@@ -132,16 +142,22 @@ So run the following command to get the public keys on both master as well as wo
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 OK
 BASH
+
+
 Step 7 - Add kubernetes repo
 As a next step we need to add the kubernetes repo to both master as well as worker node
 
 sudo bash -c 'echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list'
 BASH
+
+
 Step 8 - Install kubernetes
 Now after adding the kubernetes repo we need to install the kubernetes on both mater as well as worker node
 
 sudo apt-get update && sudo apt-get install -y kubelet kubeadm kubectl
 BASH
+
+
 Step 9 - Enable and Start kubelet
 Alright now we have installed the kubernetes, now we need to enable the kubelet support for both master as well worker node
 
@@ -149,6 +165,8 @@ sudo systemctl enable kubelet
 
 sudo systemctl start kubelet
 BASH
+
+
 Step 10 - Initialize the kubernetes cluster
 Okay now we have reach to point where we have done all the prerequisite for initializing the kubernetes cluster.
 
@@ -160,6 +178,8 @@ Note down kubeadm join command which we are going to use from worker node to joi
 
 sudo kubeadm join 100.0.0.1:6443 --token g2bsw7.5xr3bqc21eqyc6r7 --discovery-token-ca-cert-hash sha256:39b2b0608b9300b3342a8d0a0e9204c8fc74d45b008043a810f94e4f1fb8861f
 BASH
+
+
 Step 11 - Move kube config file to current user (only run on master)
 To interact with the kubernetes cluster and to user kubectl command, we need to have the kube config file with us.
 
@@ -169,6 +189,8 @@ mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 BASH
+
+
 Step 12 - Apply CNI from kube-flannel.yml(only run on master)
 After the master of the cluster is ready to handle jobs and the services are running, for the purpose of making containers accessible to each other through networking, we need to set up the network for container communication.
 
@@ -219,6 +241,8 @@ daemonset.apps/kube-flannel-ds-arm created
 daemonset.apps/kube-flannel-ds-ppc64le created
 daemonset.apps/kube-flannel-ds-s390x created
 BASH
+
+
 Step 13 - Join worker nodes to master(only run on worker)
 In the Step 10 we generated the token and kubeadm join command.
 
@@ -243,6 +267,8 @@ This node has joined the cluster:
 
 Run 'kubectl get nodes' on the control-plane to see this node join the cluster.
 BASH
+
+
 Step 14 - Check the nodes status(only run on master)
 To check the status of the nodes use
 
